@@ -44,7 +44,13 @@ if generate_btn:
         returns = price_data.pct_change().dropna()
 
         portfolio_returns = (returns * weights).sum(axis=1)
+        portfolio_returns = portfolio_returns.dropna()
+
         qs.extend_pandas()
+
+          if portfolio_returns.empty:
+          st.error("No valid return data available. Try selecting a different date range or stocks.")
+          st.stop()
 
         #Display Metrics
         st.subheader("Portfolio Performance Metrics")
@@ -89,3 +95,4 @@ if generate_btn:
             
             
     st.success("Analysis Complete! Explore your portfolio metrics above.")
+
