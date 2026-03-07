@@ -40,17 +40,17 @@ if generate_btn:
         st.stop()
     
     with st.spinner("Fetching data and computing analytics..."):
-        price_data = yf.download(tickers, start=start_date, end=end_date)["Close"]
+        price_data = yf.download(tickers, start=start_date, end=end_date, auto_adjust=True)["Close"]
+        price_data = price_data.dropna()
+
         returns = price_data.pct_change().dropna()
 
         portfolio_returns = (returns * weights).sum(axis=1)
         portfolio_returns = portfolio_returns.dropna()
 
-        qs.extend_pandas()
-
-          if portfolio_returns.empty:
-          st.error("No valid return data available. Try selecting a different date range or stocks.")
-          st.stop()
+        if portfolio_returns.empty:
+            st.error("No valid portfolio returns data. Please adjust your selection.")
+            st.stop()
 
         #Display Metrics
         st.subheader("Portfolio Performance Metrics")
@@ -67,10 +67,13 @@ if generate_btn:
             title="Portfolio Allocation")
         st.plotly_chart(fig_pie, use_container_width=True)
 
-        # Monthly Returns Heatmap
+        # Monthly Returns
         st.subheader("Monthly Returns Heatmap")
-        st.dataframe(portfolio_returns.monthly_returns().style.format("{:.2%}"))
-
+        monthly_returns = qs.stats.monthly_returns(portfolio_returns)
+        st.dataframe(
+         monthly_returns.style.format("{:.2%}")
+        )
+      
         # Cumulative Returns
         st.subheader("Cumulative Returns")
         st.line_chart((1 + portfolio_returns).cumprod())
@@ -95,4 +98,3 @@ if generate_btn:
             
             
     st.success("Analysis Complete! Explore your portfolio metrics above.")
-
