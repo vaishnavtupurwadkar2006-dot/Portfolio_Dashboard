@@ -34,4 +34,4 @@ Generates QuantStats HTML performance report for download
 ![Returns](assets/returns.png)
 
 ### QuantStats Report
-![Report](assets/quantstats_report.html)
+![Report](assets/quantstats_report.png)
