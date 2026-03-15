@@ -30,7 +30,7 @@ start_date, end_date = st.sidebar.date_input(
 
 generate_btn = st.sidebar.button("Generate Portfolio Analysis")
 
-# ========== Main Logic ==========
+#  Main Logic
 if generate_btn:
     if not tickers:
         st.error("Please select at least one stock ticker.")
