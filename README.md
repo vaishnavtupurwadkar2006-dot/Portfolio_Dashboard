@@ -24,3 +24,14 @@ Portfolio_Dashboard
   End-of-year returns distribution
 
 Generates QuantStats HTML performance report for download
+
+## Screenshots
+
+### Portfolio Allocation
+![Pie Chart](assets/pie_chart.png)
+
+### Cumulative Returns & Monthly Heatmap
+![Returns](assets/returns.png)
+
+### QuantStats Report
+![Report](assets/quantstats_report.html)
