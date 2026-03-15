@@ -5,6 +5,8 @@ Portfolio_Dashboard
 -A Streamlit-based dashboard that allows users to build custom equity portfolios using NSE-listed stocks and analyze performance using QuantStats, YFinance, and Plotly.
 -This tool fetches historical market data, computes returns, and generates professional-grade analytics including Sharpe Ratio, CAGR, Volatility, Drawdowns, heatmaps, cumulative charts, and a downloadable performance report.
 
+🔗 **[Live Demo](https://yourappname.streamlit.app)**
+
  Features
 
 - Select multiple NSE stocks from a curated list
