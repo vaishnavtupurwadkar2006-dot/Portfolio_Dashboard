@@ -5,12 +5,31 @@ import streamlit as st
 
 @st.cache_data
 def fetch_data(tickers, start_date, end_date):
-    """Fetches historical data for the given tickers."""
     try:
-        data = yf.download(tickers, start=start_date, end=end_date)["Close"]
-        if isinstance(data, pd.Series):
-             data = data.to_frame()
-        return data
+        data = yf.download(
+            tickers,
+            start=start_date,
+            end=end_date,
+            auto_adjust=True,
+            progress=False
+        )
+
+        if data.empty:
+            return pd.DataFrame()
+
+        # Extract Close prices
+        if isinstance(data.columns, pd.MultiIndex):
+            prices = data["Close"]
+        else:
+            prices = data[["Close"]]
+            prices.columns = tickers if len(tickers) == 1 else prices.columns
+
+        # Remove empty columns and rows
+        prices = prices.dropna(axis=1, how="all")
+        prices = prices.dropna(how="all")
+
+        return prices
+
     except Exception as e:
         st.error(f"Error fetching data: {e}")
         return pd.DataFrame()
@@ -36,8 +55,21 @@ def get_fundamentals(tickers):
     return pd.DataFrame(fundamentals)
 
 def calculate_portfolio_returns(returns, weights):
-    """Calculates weighted portfolio returns."""
-    return (returns * weights).sum(axis=1)
+    if returns.empty:
+        return pd.Series(dtype=float)
+
+    if len(weights) != returns.shape[1]:
+        raise ValueError(
+            f"{len(weights)} weights supplied for {returns.shape[1]} assets."
+        )
+
+    weights = np.asarray(weights)
+
+    return pd.Series(
+        returns.to_numpy() @ weights,
+        index=returns.index,
+        name="Portfolio"
+    )
 
 def run_monte_carlo(returns, num_simulations=1000, days=252):
     """Runs a Monte Carlo simulation for portfolio projection (Vectorized)."""
@@ -88,13 +120,20 @@ def optimize_portfolio(returns, risk_free_rate=0.0):
     return result.x, -result.fun
 
 def generate_insights(portfolio_returns, benchmark_returns=None):
-    """Generates text-based insights based on metrics."""
     import quantstats as qs
+
+    portfolio_returns = portfolio_returns.dropna()
+
+    if portfolio_returns.empty:
+        return ["⚠️ No portfolio return data available."]
+
     insights = []
-    
+
     sharpe = qs.stats.sharpe(portfolio_returns)
     cagr = qs.stats.cagr(portfolio_returns)
     volatility = qs.stats.volatility(portfolio_returns)
+
+    
     
     # Sharpe Insights
     if sharpe > 1.2:
